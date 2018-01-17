@@ -1,6 +1,6 @@
 # -*- coding:utf8 -*-
-from stupid_answer.utils import baidu_url, rail_top
-from stupid_answer.utils import screen_cut, get_text_line, get_questions, deal_questions, get_answer, open_webboswer
+from utils import baidu_url, rail_top, cs_mac_rail_top
+from utils import screen_cut, get_text_line, get_questions, deal_questions, get_answer, open_webboswer
 
 
 class StupidAnswer(object):
@@ -26,7 +26,7 @@ class StupidAnswer(object):
 
     # 百万超人
     def billon_super_man(self, rail, source, url, open_type):
-        screen_cut(rail)
+        screen_cut(cs_mac_rail_top)
         text_line = get_text_line()
         print(text_line)
         if not text_line:

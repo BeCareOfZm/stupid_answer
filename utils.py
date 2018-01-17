@@ -93,17 +93,20 @@ def get_questions(text_line):
 
     for text in text_line:
         questions.append(text)
+    if len(questions) == 2:
+        q = questions[1]
+        questions.extend(list(q))
     return questions
 
 
 # 百万富翁去掉选项的题号
 def billon_superman_text(strs):
     if "A." == strs[:2].upper():
-        strs = strs.lstrip("A.", "")
+        strs = strs.lstrip("A.")
     elif "B." == strs[:2].upper():
-        strs = strs.lstrip("B.", "")
+        strs = strs.lstrip("B.")
     elif "C." == strs[:2].upper():
-        strs = strs.lstrip("C.", "")
+        strs = strs.lstrip("C.")
     return strs
 
 
@@ -114,7 +117,7 @@ def del_question_id(strs):
         length = len(res.group())
         if length > 2:
             return strs
-        if strs[length] == '.':
+        if len(strs) > length and strs[length] == '.':
             strs = strs[length+1:]
         else:
             strs = strs[length:]
@@ -127,10 +130,11 @@ def deal_questions(questions, source=0):
     source: 0: 冲顶大会 1: 百万英雄
     """
     questions_list = []
-    for q in questions:
+    for i, q in enumerate(questions):
         strs = q.replace(" ", "")
         strs = strs.replace("\n", "")
-        strs = del_question_id(strs)
+        if i == 0:
+            strs = del_question_id(strs)
         if source == 1:
             strs = billon_superman_text(strs)
         if "《" in strs:
@@ -141,12 +145,35 @@ def deal_questions(questions, source=0):
     return questions_list
 
 
+def deep_search(q, text):
+    print("答案: {}".format(q))
+    if len(q) == 2:
+        for t in q:
+            print("答案:{} --> {}个".format(t, text.count(t)))
+    if len(q) > 2:
+        if '的' in q:
+            qs = q.split("的")
+            for t in qs:
+                print("答案:{} --> {}个".format(t, text.count(t)))
+        if '·' in q:
+            qs = q.split("·")
+            for t in qs:
+                print("答案:{} --> {}个".format(t, text.count(t)))
+
+
 # 获取答案列表
 def get_answer(questions, url=baidu_url):
     res = requests.get(url=url.format(questions[0]), headers=HEADERS)
     print(questions)
+    status = 0
     for q in questions[1:]:
-        print(u"答案:{} --> {}个".format(q, res.text.count(q)))
+        num = res.text.count(q)
+        print("答案:{} --> {}个".format(q, num))
+        if num:
+            status = 1
+    if not status:
+        for q in questions[1:]:
+            deep_search(q, res.text)
 
 
 # 打开url
